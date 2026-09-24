@@ -14,6 +14,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="logo.png" type="image/png">
+
+  <!-- Meta Pixel -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+    const META_PIXEL_ID = '1434960325249325';
+    // Endpoint da API de Conversões (server.js).
+    const META_CAPI_ENDPOINT = '/api/meta-event';
+
+    // Dispara o evento no navegador e (se configurado) no servidor com o mesmo eventID, para o Meta deduplicar.
+    function trackMeta(eventName, customData) {
+      const eventID = eventName + '.' + Date.now() + '.' + Math.random().toString(36).slice(2, 10);
+      fbq('track', eventName, customData || {}, { eventID });
+      if (META_CAPI_ENDPOINT) {
+        const payload = JSON.stringify({
+          event_name: eventName,
+          event_id: eventID,
+          event_source_url: location.href,
+          custom_data: customData || {}
+        });
+        navigator.sendBeacon(META_CAPI_ENDPOINT, new Blob([payload], { type: 'application/json' }));
+      }
+    }
+
+    fbq('init', META_PIXEL_ID);
+    trackMeta('PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1434960325249325&ev=PageView&noscript=1" alt=""></noscript>
+  <!-- End Meta Pixel -->
 </head>
 <body>
 
@@ -55,7 +88,7 @@
       <div class="section-label"><span>Consultoras de Vendas</span></div>
 
       <!-- 2. WANE -->
-      <a href="https://wa.me/5577981413913?text=Ol%C3%A1%20Wane%2C%20vim%20pelo%20link!%20Quero%20conhecer%20a%20Use%20Dondoka." target="_blank" rel="noopener" class="btn btn-wpp" id="btn-wane">
+      <a href="https://wa.me/5577981413913?text=Ol%C3%A1%20Wane%2C%20vim%20pelo%20link!%20Quero%20conhecer%20a%20Use%20Dondoka." target="_blank" rel="noopener" class="btn btn-wpp" id="btn-wane" data-meta-event="Contact" data-meta-name="Consultora Wane">
         <span class="btn-icon wpp-icon">
           <svg width="22" height="22"><use href="#icon-wpp"/></svg>
         </span>
@@ -67,7 +100,7 @@
       </a>
 
       <!-- 3. ANA -->
-      <a href="https://wa.me/5577988165200?text=Ol%C3%A1%20Ana%2C%20vim%20pelo%20link!%20Quero%20conhecer%20a%20Use%20Dondoka." target="_blank" rel="noopener" class="btn btn-wpp" id="btn-ana">
+      <a href="https://wa.me/5577988165200?text=Ol%C3%A1%20Ana%2C%20vim%20pelo%20link!%20Quero%20conhecer%20a%20Use%20Dondoka." target="_blank" rel="noopener" class="btn btn-wpp" id="btn-ana" data-meta-event="Contact" data-meta-name="Consultora Ana">
         <span class="btn-icon wpp-icon">
           <svg width="22" height="22"><use href="#icon-wpp"/></svg>
         </span>
@@ -95,7 +128,7 @@
       <div class="section-label"><span>Grupos Exclusivos</span></div>
 
       <!-- 5. GRUPO VIP PREMIUM -->
-      <a href="https://chat.whatsapp.com/GRoy4R8ztFKA4FfQgmHXiv?mode=gi_t" target="_blank" rel="noopener" class="btn btn-vip" id="btn-grupo-premium">
+      <a href="https://chat.whatsapp.com/GRoy4R8ztFKA4FfQgmHXiv?mode=gi_t" target="_blank" rel="noopener" class="btn btn-vip" id="btn-grupo-premium" data-meta-event="Contact" data-meta-name="Grupo VIP Linha Premium">
         <span class="btn-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M4 20l2-12 6 6 4-8 4 8 2-8 2 12"/></svg>
         </span>
@@ -107,7 +140,7 @@
       </a>
 
       <!-- 6. GRUPO VIP PROMOCOES -->
-      <a href="https://chat.whatsapp.com/ICoKrUOXWMaEE7U9dtRJe4?s=sh&p=i&mlu=4" target="_blank" rel="noopener" class="btn btn-promo" id="btn-grupo-promocoes">
+      <a href="https://chat.whatsapp.com/ICoKrUOXWMaEE7U9dtRJe4?s=sh&p=i&mlu=4" target="_blank" rel="noopener" class="btn btn-promo" id="btn-grupo-promocoes" data-meta-event="Contact" data-meta-name="Grupo Ofertas e Promoções">
         <span class="btn-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
         </span>
@@ -156,6 +189,12 @@
         });
       }, { threshold: 0.05 });
       btns.forEach(btn => observer.observe(btn));
+
+      document.querySelectorAll('[data-meta-event]').forEach(el => {
+        el.addEventListener('click', () => {
+          trackMeta(el.dataset.metaEvent, { content_name: el.dataset.metaName });
+        });
+      });
 
       btns.forEach(btn => {
         btn.addEventListener('click', function(e) {
