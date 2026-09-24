@@ -38,8 +38,20 @@
           event_source_url: location.href,
           custom_data: customData || {}
         });
-        navigator.sendBeacon(META_CAPI_ENDPOINT, new Blob([payload], { type: 'application/json' }));
+        // Espera o pixel criar o cookie _fbp (até 3s): o evento do navegador chega primeiro
+        // e o do servidor leva o _fbp, melhorando a correspondência.
+        whenFbpReady(() => {
+          navigator.sendBeacon(META_CAPI_ENDPOINT, new Blob([payload], { type: 'application/json' }));
+        });
       }
+    }
+
+    function whenFbpReady(callback) {
+      const start = Date.now();
+      (function check() {
+        if (document.cookie.includes('_fbp=') || Date.now() - start > 3000) callback();
+        else setTimeout(check, 100);
+      })();
     }
 
     fbq('init', META_PIXEL_ID);
