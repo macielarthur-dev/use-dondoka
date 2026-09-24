@@ -202,6 +202,19 @@
       }, { threshold: 0.05 });
       btns.forEach(btn => observer.observe(btn));
 
+      // Visitante de anúncio (link com utm_medium=pago): a mensagem das consultoras vira "vim pelo anúncio".
+      // Guarda na sessão para continuar valendo se a página for recarregada.
+      let fromAd = new URLSearchParams(location.search).get('utm_medium') === 'pago';
+      try {
+        if (fromAd) sessionStorage.setItem('fromAd', '1');
+        else fromAd = sessionStorage.getItem('fromAd') === '1';
+      } catch {}
+      if (fromAd) {
+        document.querySelectorAll('a[href*="vim%20pelo%20link"]').forEach(el => {
+          el.href = el.href.replace('vim%20pelo%20link', 'vim%20pelo%20an%C3%BAncio');
+        });
+      }
+
       document.querySelectorAll('[data-meta-event]').forEach(el => {
         el.addEventListener('click', () => {
           trackMeta(el.dataset.metaEvent, { content_name: el.dataset.metaName });
