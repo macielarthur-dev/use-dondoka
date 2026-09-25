@@ -9,6 +9,7 @@ const PIXEL_ID = process.env.META_PIXEL_ID || '1434960325249325';
 const CAPI_TOKEN = process.env.META_CAPI_TOKEN;
 const GRAPH_VERSION = process.env.META_GRAPH_VERSION || 'v23.0';
 const TEST_EVENT_CODE = process.env.META_TEST_EVENT_CODE; // só para "Testar eventos"
+const DEBUG = process.env.META_DEBUG === '1'; // loga IP recebido e resposta do Meta
 
 const ALLOWED_EVENTS = new Set(['PageView', 'Contact']);
 
@@ -102,12 +103,26 @@ async function handleMetaEvent(req, res) {
   };
   if (TEST_EVENT_CODE) payload.test_event_code = TEST_EVENT_CODE;
 
+  if (DEBUG) {
+    console.log('CAPI debug', JSON.stringify({
+      event_name,
+      ip_enviado: userData.client_ip_address,
+      x_forwarded_for: req.headers['x-forwarded-for'] || null,
+      x_real_ip: req.headers['x-real-ip'] || null,
+      socket: req.socket.remoteAddress,
+      tem_user_agent: Boolean(userData.client_user_agent),
+      tem_fbp: Boolean(userData.fbp),
+      tem_fbc: Boolean(userData.fbc),
+    }));
+  }
+
   try {
     const r = await fetch(
       `https://graph.facebook.com/${GRAPH_VERSION}/${PIXEL_ID}/events?access_token=${encodeURIComponent(CAPI_TOKEN)}`,
       { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }
     );
     if (!r.ok) console.error('CAPI erro', r.status, await r.text());
+    else if (DEBUG) console.log('CAPI resposta', await r.text());
   } catch (err) {
     console.error('CAPI falhou', err.message);
   }
