@@ -202,9 +202,13 @@
       }, { threshold: 0.05 });
       btns.forEach(btn => observer.observe(btn));
 
-      // Visitante de anúncio (link com utm_medium=pago): a mensagem das consultoras vira "vim pelo anúncio".
+      // Visitante de anúncio (utm_medium=pago) ou vindo da loja (origem=loja ou referrer da loja — quase
+      // todo tráfego da loja vem de anúncio): a mensagem das consultoras vira "vim pelo anúncio".
       // Guarda na sessão para continuar valendo se a página for recarregada.
-      let fromAd = new URLSearchParams(location.search).get('utm_medium') === 'pago';
+      const params = new URLSearchParams(location.search);
+      let fromAd = params.get('utm_medium') === 'pago'
+        || params.get('origem') === 'loja'
+        || /(^|\.)usedondokastore\.com$/.test((() => { try { return new URL(document.referrer).hostname; } catch { return ''; } })());
       try {
         if (fromAd) sessionStorage.setItem('fromAd', '1');
         else fromAd = sessionStorage.getItem('fromAd') === '1';
