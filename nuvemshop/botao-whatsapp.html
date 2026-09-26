@@ -1,0 +1,22 @@
+<!-- Nuvemshop: faz o botão flutuante de WhatsApp da loja abrir a landing de links
+     (em vez do número do pós-venda). O ?origem=loja faz a landing usar a mensagem "vim pelo anúncio". -->
+<script>
+(function () {
+  var DESTINO = 'https://links.usedondoka.com/?origem=loja';
+
+  function ajustarBotao() {
+    var botoes = document.querySelectorAll('a.btn-whatsapp');
+    for (var i = 0; i < botoes.length; i++) {
+      if (botoes[i].getAttribute('href') !== DESTINO) {
+        botoes[i].setAttribute('href', DESTINO);
+        botoes[i].setAttribute('aria-label', 'Fale com uma consultora');
+      }
+    }
+  }
+
+  ajustarBotao();
+  document.addEventListener('DOMContentLoaded', ajustarBotao);
+  // O tema pode recriar o botão depois do carregamento; reaplica quando isso acontecer.
+  new MutationObserver(ajustarBotao).observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
